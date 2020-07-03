@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "start": "supervisor app.js"
+  },
+  "devDependencies": {
+    "connect": "^3.7.0",
+    "connect-history-api-fallback": "^1.6.0",
+    "koa": "^2.13.0",
+    "koa-bodyparser": "^4.3.0",
+    "koa-onerror": "^4.1.0",
+    "koa-router": "^9.0.1",
+    "koa-static": "^5.0.0",
+    "koa2-connect-history-api-fallback": "^0.1.2",
+    "koa2-cors": "^2.0.6",
+    "koa2-proxy-middleware": "^0.0.4"
+  }
+}
