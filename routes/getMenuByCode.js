@@ -1,6 +1,6 @@
 const router = require('koa-router')();
 
-router.prefix = '/permissionApi';
+router.prefix('/permissionApi');
 
 router.get('/menu/menuInfoQueryByAppCode/:name', async (ctx, next) => {
     if (ctx.params.name === 'TEST') {

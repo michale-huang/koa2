@@ -1,9 +1,17 @@
 // 为了处理URL跳转的问题，我们需要引入koa-router中间件，让它负责处理URL映射
 const router = require('koa-router')();
 
+router.prefix('/whiteList');
+
+router.get('/index', async (ctx, next) => {
+    await ctx.render('index');
+});
+
 router.get('/login', async (ctx, next) => {
+    const port = ctx.header.host.split(':')[1];
+    console.log(port)
     ctx.body = `<h1>Index</h1>
-                <form action="/signin" id="login-form" method="post">
+                <form action="/whiteList/signin" id="login-form" method="post">
                     <p>Name: <input name="name" value=""></p>
                     <p>Password: <input name="password" type="password"></p>
                     <p><input type="submit" value="Submit"></p>
@@ -11,13 +19,13 @@ router.get('/login', async (ctx, next) => {
                 <div id="result"></div>
                 <script>
                     const form = new FormData(document.getElementById('login-form'));
-                    fetch('http://localhost:8980/user/hh').then(res => {
+                    fetch('http://localhost:${port}/whiteList/user/hh').then(res => {
                         res.json().then(data => {
                             document.querySelector('#result').innerText = data
                             console.log(data)
                         })
                     })
-                    fetch('http://localhost:8980/submitUserInfo?age=12', {
+                    fetch('http://localhost:${port}/whiteList/submitUserInfo?age=12', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
