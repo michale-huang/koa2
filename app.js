@@ -49,7 +49,7 @@ const proxyOptions = {
 };
 
 // app.use(proxy(proxyOptions));
-
+// app.use('/permissionApi', createProxyMiddleware({ target: 'http://192.168.1.20:15000', changeOrigin: true, pathRewrite: { '/permissionApi': '' } }))
 app.use(async (ctx, next) => {
     if (ctx.url.startsWith('/permissionApi')) {
         ctx.respond = false
