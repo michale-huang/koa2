@@ -51,12 +51,36 @@ const proxyOptions = {
 // app.use(proxy(proxyOptions));
 // app.use('/permissionApi', createProxyMiddleware({ target: 'http://192.168.1.20:15000', changeOrigin: true, pathRewrite: { '/permissionApi': '' } }))
 app.use(async (ctx, next) => {
+    if (ctx.url.startsWith('/mouldApi')) {
+        // ctx.respond = false
+        await k2c(createProxyMiddleware({
+            target: 'http://192.168.1.20:17000',
+            changeOrigin: true,
+            pathRewrite: { '^/mouldApi': '' }
+        }))(ctx, next)
+    }
+    if (ctx.url.startsWith('/dictionaryApi')) {
+        // ctx.respond = false
+        await k2c(createProxyMiddleware({
+            target: 'http://192.168.1.20:18000',
+            changeOrigin: true,
+            pathRewrite: { '^/dictionaryApi': '' }
+        }))(ctx, next)
+    }
     if (ctx.url.startsWith('/permissionApi')) {
-        ctx.respond = false
+        // ctx.respond = false
         await k2c(createProxyMiddleware({
             target: 'http://192.168.1.20:15000',
             changeOrigin: true,
             pathRewrite: { '^/permissionApi': '' }
+        }))(ctx, next)
+    }
+    if (ctx.url.startsWith('/entrustApi')) {
+        // ctx.respond = false
+        await k2c(createProxyMiddleware({
+            target: 'http://192.168.1.20:23000',
+            changeOrigin: true,
+            pathRewrite: { '^/entrustApi': '' }
         }))(ctx, next)
     }
     await next()
