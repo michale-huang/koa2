@@ -9,6 +9,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 // vue-router为history模式时，刷新页面会404
 // koa2的一个中间件，用于处理vue-router使用history模式返回index.html，让koa2支持SPA应用程序。
 const { historyApiFallback  } = require('koa2-connect-history-api-fallback');
+const compress = require('koa-compress');
 const static = require('koa-static');
 const path = require('path');
 
@@ -20,6 +21,14 @@ const app = new Koa();
 const port = 3002;
 
 const staticPath = '/dist';
+
+// 开启压缩
+app.use(compress({
+    threshold: 2048,
+    gzip: {
+        flush: require('zlib').constants.Z_SYNC_FLUSH
+    }
+}))
 
 const routes = {
     getMenuByCode,
@@ -81,6 +90,22 @@ app.use(async (ctx, next) => {
             target: 'http://192.168.1.20:23000',
             changeOrigin: true,
             pathRewrite: { '^/entrustApi': '' }
+        }))(ctx, next)
+    }
+    if (ctx.url.startsWith('/logisticsApi')) {
+        // ctx.respond = false
+        await k2c(createProxyMiddleware({
+            target: 'http://192.168.1.20:22000',
+            changeOrigin: true,
+            pathRewrite: { '^/logisticsApi': '' }
+        }))(ctx, next)
+    }
+    if (ctx.url.startsWith('/productApi')) {
+        // ctx.respond = false
+        await k2c(createProxyMiddleware({
+            target: 'http://192.168.1.20:27000',
+            changeOrigin: true,
+            pathRewrite: { '^/productApi': '' }
         }))(ctx, next)
     }
     await next()
