@@ -9,55 +9,52 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 // vue-router为history模式时，刷新页面会404
 // koa2的一个中间件，用于处理vue-router使用history模式返回index.html，让koa2支持SPA应用程序。
 const { historyApiFallback  } = require('koa2-connect-history-api-fallback');
-const compress = require('koa-compress');
+// const compress = require('koa-compress');
 const static = require('koa-static');
 const path = require('path');
+const route = require('koa-route')
+const websockify = require('koa-websocket');
 
 const getMenuByCode = require('./routes/getMenuByCode');
 const login = require('./routes/login');
 
-const app = new Koa();
+const app = websockify(new Koa());
 
 const port = 3002;
 
 const staticPath = '/dist';
 
+app.ws.use((ctx, next) => {
+    ctx.websocket.send("连接成功");
+    return next(ctx);
+});
+
+app.ws.use(route.all('/', function (ctx) {
+    /**接收消息*/
+    ctx.websocket.on('message', function (message) {
+        console.log(message);
+        // 返回给前端的数据
+        let data = JSON.stringify({
+            id: Math.ceil(Math.random()*1000),
+            time: parseInt(new Date()/1000)
+        })
+        ctx.websocket.send(data);
+    })
+}));
+
 // 开启压缩
-app.use(compress({
-    threshold: 2048,
-    gzip: {
-        flush: require('zlib').constants.Z_SYNC_FLUSH
-    }
-}))
+// app.use(compress({
+//     threshold: 2048,
+//     gzip: {
+//         flush: require('zlib').constants.Z_SYNC_FLUSH
+//     }
+// }))
 
 const routes = {
     getMenuByCode,
     login
 };
 
-const proxyOptions = {
-    targets: {
-        '/mouldApi': {
-            target: 'http://192.168.1.20:17000',
-            changeOrigin: true
-        },
-        '/dictionaryApi': {
-            target: 'http://192.168.1.20:18000',
-            changeOrigin: true
-        },
-        '/permissionApi': {
-            target: 'http://192.168.1.20:15000',
-            changeOrigin: true,
-            pathRewrite: { '^/permissionApi': '' }
-        },
-        '/entrustApi': {
-            target: 'http://192.168.1.20:23000',
-            changeOrigin: true
-        }
-    }
-};
-
-// app.use(proxy(proxyOptions));
 // app.use('/permissionApi', createProxyMiddleware({ target: 'http://192.168.1.20:15000', changeOrigin: true, pathRewrite: { '/permissionApi': '' } }))
 app.use(async (ctx, next) => {
     if (ctx.url.startsWith('/mouldApi')) {
@@ -106,6 +103,30 @@ app.use(async (ctx, next) => {
             target: 'http://192.168.1.20:27000',
             changeOrigin: true,
             pathRewrite: { '^/productApi': '' }
+        }))(ctx, next)
+    }
+    if (ctx.url.startsWith('/loginApi')) {
+        // ctx.respond = false
+        await k2c(createProxyMiddleware({
+            target: 'http://192.168.1.20:16000',
+            changeOrigin: true,
+            pathRewrite: { '^/loginApi': '' }
+        }))(ctx, next)
+    }
+    if (ctx.url.startsWith('/homeApi')) {
+        // ctx.respond = false
+        await k2c(createProxyMiddleware({
+            target: 'http://192.168.1.20:20000',
+            changeOrigin: true,
+            pathRewrite: { '^/homeApi': '' }
+        }))(ctx, next)
+    }
+    if (ctx.url.startsWith('/logisticsPlanApi')) {
+        // ctx.respond = false
+        await k2c(createProxyMiddleware({
+            target: 'http://192.168.1.20:24000',
+            changeOrigin: true,
+            pathRewrite: { '^/logisticsPlanApi': '' }
         }))(ctx, next)
     }
     await next()
