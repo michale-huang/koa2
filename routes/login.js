@@ -1,7 +1,7 @@
 // 为了处理URL跳转的问题，我们需要引入koa-router中间件，让它负责处理URL映射
 const router = require('koa-router')();
 
-router.prefix('/whiteList');
+router.prefix('/publicApi');
 
 router.get('/index', async (ctx, next) => {
     await ctx.render('index');

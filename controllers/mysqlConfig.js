@@ -9,20 +9,19 @@ var pool = mysql.createPool({
 });
 
 let allServices = {
-    query: function (sql, values) {
-
+    query: function (sql) {
         return new Promise((resolve, reject) => {
             pool.getConnection(function (err, connection) {
                 if (err) {
                     reject(err)
                 } else {
-                    connection.query(sql, values, (err, rows) => {
-
+                    connection.query(sql, (err, rows) => {
                         if (err) {
                             reject(err)
                         } else {
                             resolve(rows)
                         }
+                        // 当连接不再使用时，用connection对象的release方法将其归还到连接池中
                         connection.release()
                     })
                 }
@@ -31,13 +30,22 @@ let allServices = {
 
     },
    findUserData: function (name) {
-        let _sql = `select * from users where name="${name}";`
+       console.log(name)
+        let _sql = `SELECT name, age, sex FROM base_info WHERE name="${name}";`
         return allServices.query(_sql)
     },
-    addUserData: (obj) => {
-         let _sql = "insert into users set name=?,pass=?,avator=?,moment=?;"
-         return allServices.query(_sql, obj)
-     }
+    addUserData: (userData) => {
+        let _sql = `INSERT INTO base_info SET name="${userData.name}",age=${userData.age},sex=${userData.sex};`
+        return allServices.query(_sql)
+    },
+    delUserData: (userData) => {
+        let _sql = `DELETE FROM base_info WHERE name="${userData.name}";`
+        return allServices.query(_sql)
+    },
+    updateUserData: (userData) => {
+        let _sql = `UPDATE base_info SET age=${userData.age} WHERE name="${userData.name}";`
+        return allServices.query(_sql)
+    }
 }
 
 module.exports = allServices;

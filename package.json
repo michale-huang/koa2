@@ -1,6 +1,13 @@
 {
   "scripts": {
-    "start": "supervisor app.js"
+    "start": "supervisor app.js",
+    "serve": "supervisor iframe.js",
+    "taro": "supervisor taro.js",
+    "main": "supervisor main.js",
+    "start-pm2": "pm2 start app.js",
+    "serve-pm2": "pm2 start iframe.js",
+    "taro-pm2": "pm2 start taro.js",
+    "main-pm2": "pm2 start mainaro.js"
   },
   "devDependencies": {
     "connect": "^3.7.0",
@@ -21,5 +28,8 @@
     "koa2-connect-history-api-fallback": "^0.1.2",
     "koa2-cors": "^2.0.6",
     "koa2-proxy-middleware": "^0.0.4"
+  },
+  "dependencies": {
+    "mysql": "^2.18.1"
   }
 }
